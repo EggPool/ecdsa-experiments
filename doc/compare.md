@@ -15,7 +15,6 @@
 |Signature time| High | Low | Very Low |
 |Verifying time| Low | High | Low (+batch) |
 |I P| | | public domain|
-|Wiki| | https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm| https://en.wikipedia.org/wiki/EdDSA|
 
 
 https://www.ssl.com/article/comparing-ecdsa-vs-rsa/  
