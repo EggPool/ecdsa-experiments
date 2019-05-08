@@ -2,6 +2,7 @@
 Basic tests
 """
 
+import base58
 import json
 import sys
 sys.path.append('../')
@@ -24,3 +25,19 @@ if __name__ == "__main__":
     signer = SignerFactory.from_seed(TEST_SEED, SignerType.ECDSA)
     print(signer.to_dict())
     assert(signer.to_dict()['address'] == '15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma')
+
+    # CRW Test - seed is in fact a 32 byte privkey (random, no constraint)
+
+    # From https://gitlab.crown.tech/crown/crown-core/issues/210
+    wif = '5KZT4KD9mFd45h44LkR2ibUdt5EMF15YBtBxuRtomWAFgsAa2wa'
+    wifdecode = base58.b58decode(wif).hex()
+    print("wifdecode", wifdecode)
+    # 80e5b42f3c3fe02e161d42ff4707a174a5715b2badc7d4d3aebbea9081bd9123d566129939
+    # 80 e5b42f3c3fe02e161d42ff4707a174a5715b2badc7d4d3aebbea9081bd9123d5 66129939
+    # fits with https://crown.tech/paper_wallet/index.html
+    pk = wifdecode[2:66]
+    print("pk", pk)
+
+    signer = SignerFactory.from_seed(pk, SignerType.CRW)
+    print(signer.to_dict())
+    assert(signer.to_dict()['address'] == 'CRWGg6VvaNe6zhQ46wuEBci8VerP4qVTw8qq')

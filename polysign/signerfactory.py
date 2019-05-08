@@ -2,6 +2,7 @@ from os import urandom
 from polysign.signer import Signer, SignerType
 from polysign.signer_rsa import SignerRSA
 from polysign.signer_ecdsa import SignerECDSA
+from polysign.signer_crw import SignerCRW
 from typing import Union
 
 
@@ -31,6 +32,10 @@ class SignerFactory():
             return signer
         if signer_type == SignerType.ECDSA:
             signer = SignerECDSA()
+            signer.from_seed(seed)
+            return signer
+        if signer_type == SignerType.CRW:
+            signer = SignerCRW()
             signer.from_seed(seed)
             return signer
         raise ValueError("Unsupported Key type")

@@ -21,6 +21,7 @@ class SignerType(Enum):
     ECDSA = 2
     EDD25519 = 3
     BTC = 1000  # For test vectors
+    CRW = 1001
 
 
 class Signer(ABC):
