@@ -1,7 +1,7 @@
 .idea
-*.json
 *.bak
 *.old
+*.der
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
