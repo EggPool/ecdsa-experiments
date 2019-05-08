@@ -34,6 +34,8 @@ if __name__ == "__main__":
     print("wifdecode", wifdecode)
     # 80e5b42f3c3fe02e161d42ff4707a174a5715b2badc7d4d3aebbea9081bd9123d566129939
     # 80 e5b42f3c3fe02e161d42ff4707a174a5715b2badc7d4d3aebbea9081bd9123d5 66129939
+    # 1 byte network, 32 bytes PK, 4 bytes checksum
+    # CRW seems to use the uncompressed pubaddress format, btc uses compressed one.
     # fits with https://crown.tech/paper_wallet/index.html
     pk = wifdecode[2:66]
     print("pk", pk)
