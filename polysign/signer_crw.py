@@ -4,7 +4,7 @@
 
 import base58
 import hashlib
-from polysign.signer import Signer, SignerType
+from polysign.signer import Signer, SignerType, SignerSubType
 from typing import Union
 from hashlib import sha256
 from base64 import b64decode
@@ -30,14 +30,14 @@ class SignerCRW(Signer):
         self._key = None
         self._type = SignerType.ECDSA
 
-    def from_private_key(self, private_key: Union[bytes, str]):
+    def from_private_key(self, private_key: Union[bytes, str], subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         print('TODO')
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
-                       verify: bool=True):
+                       subtype: SignerSubType = SignerSubType.MAINNET_REGULAR, verify: bool=True):
         print('TODO')
 
-    def from_seed(self, seed: str=''):
+    def from_seed(self, seed: str='', subtype: SignerSubType = SignerSubType.MAINNET_REGULAR):
         print('crw from seed {}'.format(seed))
         try:
             key = PrivateKey.from_hex(seed)
@@ -63,7 +63,8 @@ class SignerCRW(Signer):
         return base58.b58encode(vh160 + chk).decode('utf-8')
 
     @classmethod
-    def public_key_to_address(cls, public_key: Union[bytes, str]) -> str:
+    def public_key_to_address(cls, public_key: Union[bytes, str],
+                              subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> str:
         """Reconstruct an address from the public key"""
         if type(public_key) == str:
             identifier = hashlib.new('ripemd160', sha256(bytes.fromhex(public_key)).digest()).digest()

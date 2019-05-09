@@ -31,6 +31,7 @@ identifier = key.Identifier().hex()
 print("id", identifier)
 
 priv= 'd5ba601c19bfc54e109d20736453ba150f624ee03e2b7a5a3875342cd64d2efe'
+seed = 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35'
 pk2 = PrivateKey.from_hex(priv)
 pub2 = pk2.public_key.format(compressed=False).hex()
 pub2c = pk2.public_key.format(compressed=True).hex()  # This one is used

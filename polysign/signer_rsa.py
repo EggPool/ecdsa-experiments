@@ -3,7 +3,7 @@ import json
 import re
 from hashlib import sha224
 from base64 import b64encode, b64decode
-from polysign.signer import Signer, SignerType
+from polysign.signer import Signer, SignerType, SignerSubType
 from typing import Union
 
 from Cryptodome.Hash import SHA
@@ -48,7 +48,8 @@ class SignerRSA(Signer):
             # verify pem as cryptodome does
 
     @classmethod
-    def public_key_to_address(cls, public_key: Union[bytes, str]) -> str:
+    def public_key_to_address(cls, public_key: Union[bytes, str],
+                              subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> str:
         """Reconstruct an address from the public key"""
         if type(public_key) != str:
             # But union annotation kept for common interface sake.
@@ -60,7 +61,8 @@ class SignerRSA(Signer):
         info = self.to_dict()
         return json.dumps(info)
 
-    def from_private_key(self, private_key: Union[bytes, str]) -> None:
+    def from_private_key(self, private_key: Union[bytes, str],
+                         subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> None:
         if type(private_key) is not str:
             raise RuntimeError('RSA private key have to be strings')
         try:
@@ -77,11 +79,11 @@ class SignerRSA(Signer):
         except Exception as e:
             print("Exception {} reading RSA private key".format(e))
 
-    def from_seed(self, seed: str='') -> None:
+    def from_seed(self, seed: str='', subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> None:
         raise ValueError("SignerRsa.from_seed not impl. - seed {}".format(seed))
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
-                       verify: bool=True):
+                       subtype: SignerSubType = SignerSubType.MAINNET_REGULAR, verify: bool=True):
         raise ValueError("SignerRsa.from_full_info not impl.")
 
     @classmethod

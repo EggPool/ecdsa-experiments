@@ -24,10 +24,21 @@ class SignerType(Enum):
     CRW = 1001  # Tests
 
 
+class SignerSubType(Enum):
+    """
+    Possible addresses subtype
+    """
+    NONE = 0
+    MAINNET_REGULAR = 1
+    MAINNET_MULTISIG = 2
+    TESTNET_REGULAR = 3
+    TESTNET_MULTISIG = 4
+
+
 class Signer(ABC):
 
     # Slots allow to spare ram when there can be several instances
-    __slot__ = ('_private_key', '_public_key', '_address', '_type', '_compressed', 'verbose')
+    __slot__ = ('_private_key', '_public_key', '_address', '_type', '_subtype','_compressed', 'verbose')
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
                  compressed: bool=True):
@@ -35,6 +46,7 @@ class Signer(ABC):
         self._public_key = public_key
         self._address = address
         self._type = SignerType.NONE
+        self._subtype = SignerSubType.NONE
         self.verbose = False
         self._compressed = compressed
 
@@ -48,22 +60,23 @@ class Signer(ABC):
         return self._type.name
 
     @abstractmethod
-    def from_private_key(self, private_key: Union[bytes, str]):
+    def from_private_key(self, private_key: Union[bytes, str], subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         pass
 
     @abstractmethod
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
-                       verify: bool=True):
+                       subtype: SignerSubType = SignerSubType.MAINNET_REGULAR, verify: bool=True):
         pass
 
     @abstractmethod
-    def from_seed(self, seed: str=''):
+    def from_seed(self, seed: str='', subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         """Use seed == '' to generate a random key"""
         pass
 
     @classmethod
     @abstractmethod
-    def public_key_to_address(cls, public_key: Union[bytes, str]) -> str:
+    def public_key_to_address(cls, public_key: Union[bytes, str],
+                              subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> str:
         """Reconstruct an address from the public key"""
         pass
 
@@ -84,7 +97,7 @@ class Signer(ABC):
     def to_dict(self):
         """Returns core properties as dict, compact bin form"""
         info = {'address': self._address, 'private_key': self._private_key, 'public_key': self._public_key,
-                'compressed': self._compressed, 'type': self._type.name}
+                'compressed': self._compressed, 'type': self._type.name, 'sub_type': self._subtype.name}
         return info
 
     def to_json(self):

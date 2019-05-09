@@ -6,7 +6,7 @@ import base58
 import hashlib
 import random
 from os import urandom
-from polysign.signer import Signer, SignerType
+from polysign.signer import Signer, SignerType, SignerSubType
 from typing import Union
 from hashlib import sha256
 from base64 import b64decode
@@ -33,17 +33,17 @@ class SignerECDSA(Signer):
         self._key = None
         self._type = SignerType.ECDSA
 
-    def from_private_key(self, private_key: Union[bytes, str]):
+    def from_private_key(self, private_key: Union[bytes, str], subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         """Accepts both bytes[32] or str (hex format)"""
         if type(private_key) == str:
             return self.from_seed(private_key)
         return self.from_seed(private_key.hex())
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
-                       verify: bool=True):
-        print('TODO - ecdsa.from_full_info')
+                       subtype: SignerSubType = SignerSubType.MAINNET_REGULAR, verify: bool=True):
+        raise ValueError("SignerRsa.from_full_info not impl.")
 
-    def from_seed(self, seed: str=''):
+    def from_seed(self, seed: str='', subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         """Creates key from seed - for ecdsa, seed = pk - 32 bytes random buffer"""
         if len(seed) > 64:
             # Too long seed, trim (could use better scheme for more entropy)
@@ -58,7 +58,7 @@ class SignerECDSA(Signer):
         try:
             key = PrivateKey.from_hex(seed)
             public_key = key.public_key.format(compressed=True).hex()
-            print("Public Key", public_key)
+            # print("Public Key", public_key)
             self._key = key
             self._private_key = key.to_hex()  # == seed
             self._public_key = public_key
@@ -78,7 +78,8 @@ class SignerECDSA(Signer):
         return base58.b58encode(vh160 + chk).decode('utf-8')
 
     @classmethod
-    def public_key_to_address(cls, public_key: Union[bytes, str]) -> str:
+    def public_key_to_address(cls, public_key: Union[bytes, str],
+                              subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> str:
         """Reconstruct an address from the public key"""
         if type(public_key) == str:
             identifier = hashlib.new('ripemd160', sha256(bytes.fromhex(public_key)).digest()).digest()

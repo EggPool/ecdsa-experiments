@@ -11,6 +11,17 @@ from polysign.signerfactory import SignerFactory
 
 # Never to be used for real addresses - from https://en.bitcoin.it/wiki/BIP_0032_TestVectors
 TEST_SEED = 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35'
+"""
+Identifier
+     * (hex):       3442193e1bb70916e914552172cd4e2dbc9df811
+     * (fpr):       0x3442193e
+     * (main addr): 15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma
+   * Secret key
+     * (hex):       e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35
+     * (wif):       L52XzL2cMkHxqxBXRyEpnPQZGUs3uKiL3R11XbAdHigRzDozKZeW
+   * Public key
+     * (hex):       0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2
+"""
 
 if __name__ == "__main__":
     # RSA Test
@@ -23,6 +34,7 @@ if __name__ == "__main__":
 
     # BTC ECDSA Test - seed is in fact a 32 byte privkey (random, no constraint)
     signer = SignerFactory.from_seed(TEST_SEED, SignerType.BTC)
+    print(signer)
     print(signer.to_dict())
     assert(signer.to_dict()['address'] == '15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma')
 
