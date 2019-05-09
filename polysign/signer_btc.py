@@ -21,10 +21,9 @@ from coincurve import PrivateKey, PublicKey
 
 ADDRESS_VERSION = b'\x6f'  # Bitcoin testnet
 ADDRESS_VERSION = b'\x00'  # Bitcoin mainnet
-# ADDRESS_VERSION = b'\x01\x75\x07'  # CRW
 
 
-class SignerECDSA(Signer):
+class SignerBTC(Signer):
 
     __slots__ = ('_key', )
 
@@ -41,7 +40,7 @@ class SignerECDSA(Signer):
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
                        verify: bool=True):
-        print('TODO - ecdsa.from_full_info')
+        print('TODO - SignerBTC.from_full_info')
 
     def from_seed(self, seed: str=''):
         """Creates key from seed - for ecdsa, seed = pk - 32 bytes random buffer"""
@@ -57,7 +56,7 @@ class SignerECDSA(Signer):
             seed = random.getrandbits(32*8).hex()
         try:
             key = PrivateKey.from_hex(seed)
-            public_key = key.public_key.format(compressed=True).hex()
+            public_key = key.public_key.format(compressed=False).hex()
             print("Public Key", public_key)
             self._key = key
             self._private_key = key.to_hex()  # == seed
@@ -92,7 +91,7 @@ class SignerECDSA(Signer):
     def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
                          address: str='') -> None:
         """Verify signature from raw signature. Address may be used to determine the sig type"""
-        raise ValueError("SignerECDSA.verify_signature not impl.")
+        raise ValueError("SignerBTC.verify_signature not impl.")
 
     @classmethod
     def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str = '') -> None:

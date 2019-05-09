@@ -4,6 +4,7 @@ from polysign.signer import Signer, SignerType
 from polysign.signer_rsa import SignerRSA
 from polysign.signer_ecdsa import SignerECDSA
 from polysign.signer_crw import SignerCRW
+from polysign.signer_btc import SignerBTC
 from typing import Union
 
 
@@ -34,20 +35,26 @@ class SignerFactory():
             return SignerRSA
         elif RE_ECDSA_ADDRESS.match(address):
             return SignerECDSA
+        raise ValueError("Unsupported Address type")
 
     @classmethod
     def from_seed(cls, seed: str='', signer_type: SignerType=SignerType.RSA) -> Signer:
         if seed == '':
             seed = urandom(32).hex()
+        # TODO: dict instead of all this, 3 lines
         if signer_type == SignerType.RSA:
             signer = SignerRSA()
             signer.from_seed(seed)
             return signer
-        if signer_type == SignerType.ECDSA:
+        elif signer_type == SignerType.ECDSA:
             signer = SignerECDSA()
             signer.from_seed(seed)
             return signer
-        if signer_type == SignerType.CRW:
+        elif signer_type == SignerType.BTC:
+            signer = SignerBTC()
+            signer.from_seed(seed)
+            return signer
+        elif signer_type == SignerType.CRW:
             signer = SignerCRW()
             signer.from_seed(seed)
             return signer

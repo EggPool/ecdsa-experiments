@@ -7,6 +7,7 @@ import hashlib
 from polysign.signer import Signer, SignerType
 from typing import Union
 from hashlib import sha256
+from base64 import b64decode
 
 from coincurve import PrivateKey, PublicKey
 # from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
@@ -60,3 +61,39 @@ class SignerCRW(Signer):
         vh160 = ADDRESS_VERSION + self.identifier()  # raw content
         chk = sha256(sha256(vh160).digest()).digest()[:4]
         return base58.b58encode(vh160 + chk).decode('utf-8')
+
+    @classmethod
+    def public_key_to_address(cls, public_key: Union[bytes, str]) -> str:
+        """Reconstruct an address from the public key"""
+        if type(public_key) == str:
+            identifier = hashlib.new('ripemd160', sha256(bytes.fromhex(public_key)).digest()).digest()
+        else:
+            identifier = hashlib.new('ripemd160', sha256(public_key).digest()).digest()
+        vh160 = ADDRESS_VERSION + identifier  # raw content
+        checksum = sha256(sha256(vh160).digest()).digest()[:4]
+        return base58.b58encode(vh160 + checksum).decode('utf-8')
+
+    @classmethod
+    def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
+                         address: str='') -> None:
+        """Verify signature from raw signature. Address may be used to determine the sig type"""
+        raise ValueError("SignerCRW.verify_signature not impl.")
+
+    @classmethod
+    def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str = '') -> None:
+        """Verify signature from bismuth tx network format (ecdsa sig and pubkey are b64 encoded)
+        Returns None, but raises ValueError if needed."""
+        public_key = b64decode(public_key).decode('utf-8')
+        # print(public_key)
+
+        """ TODO
+        public_key_object = RSA.importKey(public_key_pem)
+        signature_decoded = b64decode(signature)
+        verifier = PKCS1_v1_5.new(public_key_object)
+        sha_hash = SHA.new(buffer)
+        if not verifier.verify(sha_hash, signature_decoded):
+            raise ValueError(f"Invalid signature from {address}")
+        """
+        # Reconstruct address from pubkey to make sure it matches
+        if address != cls.public_key_to_address(public_key):
+            raise ValueError("Attempt to spend from a wrong address")

@@ -21,8 +21,8 @@ if __name__ == "__main__":
     # print(signer.to_json())
     assert(signer.to_dict()['address'] == wallet['Address'])
 
-    # ECDSA Test - seed is in fact a 32 byte privkey (random, no constraint)
-    signer = SignerFactory.from_seed(TEST_SEED, SignerType.ECDSA)
+    # BTC ECDSA Test - seed is in fact a 32 byte privkey (random, no constraint)
+    signer = SignerFactory.from_seed(TEST_SEED, SignerType.BTC)
     print(signer.to_dict())
     assert(signer.to_dict()['address'] == '15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma')
 
