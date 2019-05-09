@@ -6,7 +6,7 @@ import base58
 import json
 import sys
 sys.path.append('../')
-from polysign.signer import SignerType
+from polysign.signer import SignerType, SignerSubType
 from polysign.signerfactory import SignerFactory
 
 # Never to be used for real addresses - from https://en.bitcoin.it/wiki/BIP_0032_TestVectors
@@ -55,3 +55,11 @@ if __name__ == "__main__":
     signer = SignerFactory.from_seed(pk, SignerType.CRW)
     print(signer.to_dict())
     assert(signer.to_dict()['address'] == 'CRWGg6VvaNe6zhQ46wuEBci8VerP4qVTw8qq')
+
+    signer = SignerFactory.from_seed(pk, SignerType.ECDSA)
+    print(signer.to_dict())
+    assert(signer.to_dict()['address'] == 'Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog')
+
+    signer = SignerFactory.from_seed(pk, SignerType.ECDSA, subtype=SignerSubType.TESTNET_REGULAR)
+    print(signer.to_dict())
+    assert(signer.to_dict()['address'] == 'tBisH4YbEridY7Xw2Dv5sP727VA7tV2j5fTk7')

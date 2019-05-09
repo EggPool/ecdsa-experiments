@@ -19,17 +19,16 @@ from coincurve import PrivateKey, PublicKey
 # https://github.com/ludbb/secp256k1-py   is older
 
 
-ADDRESS_VERSION = b'\x6f'  # Bitcoin testnet
-ADDRESS_VERSION = b'\x00'  # Bitcoin mainnet
-# ADDRESS_VERSION = b'\x01\x75\x07'  # CRW
-
-
 class SignerECDSA(Signer):
 
     __slots__ = ('_key', )
 
-    def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str=''):
-        super().__init__(private_key, public_key, address)
+    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x4f\x54\x5b', SignerSubType.MAINNET_MULTISIG: b'\x4f\x54\xc8',
+                         SignerSubType.TESTNET_REGULAR: b'\x01\x7a\xb6\x85', SignerSubType.TESTNET_MULTISIG: b'\x01\x46\xeb\xa5'}
+
+    def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
+                 compressed: bool=True, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
+        super().__init__(private_key, public_key, address, compressed=compressed, subtype=subtype)
         self._key = None
         self._type = SignerType.ECDSA
 
@@ -45,6 +44,8 @@ class SignerECDSA(Signer):
 
     def from_seed(self, seed: str='', subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         """Creates key from seed - for ecdsa, seed = pk - 32 bytes random buffer"""
+        if subtype != SignerSubType.MAINNET_REGULAR:
+            self._subtype = subtype
         if len(seed) > 64:
             # Too long seed, trim (could use better scheme for more entropy)
             seed = seed[:64]
@@ -73,7 +74,7 @@ class SignerECDSA(Signer):
 
     def address(self):
         """Returns properly serialized address from pubkey as per btc standards"""
-        vh160 = ADDRESS_VERSION + self.identifier()  # raw content
+        vh160 = self.address_version_for_subtype(self._subtype) + self.identifier()  # raw content
         chk = sha256(sha256(vh160).digest()).digest()[:4]
         return base58.b58encode(vh160 + chk).decode('utf-8')
 
@@ -85,7 +86,7 @@ class SignerECDSA(Signer):
             identifier = hashlib.new('ripemd160', sha256(bytes.fromhex(public_key)).digest()).digest()
         else:
             identifier = hashlib.new('ripemd160', sha256(public_key).digest()).digest()
-        vh160 = ADDRESS_VERSION + identifier  # raw content
+        vh160 = cls.address_version_for_subtype(subtype) + identifier  # raw content
         checksum = sha256(sha256(vh160).digest()).digest()[:4]
         return base58.b58encode(vh160 + checksum).decode('utf-8')
 

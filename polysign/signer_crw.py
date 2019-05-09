@@ -17,16 +17,15 @@ from coincurve import PrivateKey, PublicKey
 # https://github.com/ludbb/secp256k1-py   is older
 
 
-ADDRESS_VERSION = b'\x01\x75\x07'  # CRW
-# ADDRESS_VERSION = b'\x00'  # Bitcoin mainnet
-
-
 class SignerCRW(Signer):
 
     __slots__ = ('_key', )
 
-    def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str=''):
-        super().__init__(private_key, public_key, address)
+    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x01\x75\x07'}
+
+    def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
+                 compressed=False, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
+        super().__init__(private_key, public_key, address, compressed=False, subtype=subtype)
         self._key = None
         self._type = SignerType.ECDSA
 
@@ -39,6 +38,8 @@ class SignerCRW(Signer):
 
     def from_seed(self, seed: str='', subtype: SignerSubType = SignerSubType.MAINNET_REGULAR):
         print('crw from seed {}'.format(seed))
+        if subtype != SignerSubType.MAINNET_REGULAR:
+            self._subtype = subtype
         try:
             key = PrivateKey.from_hex(seed)
             public_key = key.public_key.format(compressed=False).hex()
@@ -58,7 +59,7 @@ class SignerCRW(Signer):
 
     def address(self):
         # 1PrWZ4CXSXWbg87XS9ShhwMV6TiSXtycT7
-        vh160 = ADDRESS_VERSION + self.identifier()  # raw content
+        vh160 = self.address_version_for_subtype(self._subtype) + self.identifier()  # raw content
         chk = sha256(sha256(vh160).digest()).digest()[:4]
         return base58.b58encode(vh160 + chk).decode('utf-8')
 
@@ -70,7 +71,7 @@ class SignerCRW(Signer):
             identifier = hashlib.new('ripemd160', sha256(bytes.fromhex(public_key)).digest()).digest()
         else:
             identifier = hashlib.new('ripemd160', sha256(public_key).digest()).digest()
-        vh160 = ADDRESS_VERSION + identifier  # raw content
+        vh160 = cls.address_version_for_subtype(subtype) + identifier  # raw content
         checksum = sha256(sha256(vh160).digest()).digest()[:4]
         return base58.b58encode(vh160 + checksum).decode('utf-8')
 

@@ -38,15 +38,17 @@ class SignerSubType(Enum):
 class Signer(ABC):
 
     # Slots allow to spare ram when there can be several instances
-    __slot__ = ('_private_key', '_public_key', '_address', '_type', '_subtype','_compressed', 'verbose')
+    __slot__ = ('_private_key', '_public_key', '_address', '_type', '_subtype', '_compressed', 'verbose')
+
+    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x00'}
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
-                 compressed: bool=True):
+                 compressed: bool=True, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         self._private_key = private_key
         self._public_key = public_key
         self._address = address
         self._type = SignerType.NONE
-        self._subtype = SignerSubType.NONE
+        self._subtype = subtype
         self.verbose = False
         self._compressed = compressed
 
@@ -79,6 +81,11 @@ class Signer(ABC):
                               subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> str:
         """Reconstruct an address from the public key"""
         pass
+
+    @classmethod
+    def address_version_for_subtype(cls, subtype: SignerSubType) -> bytes:
+        # Specific one if exists, else mainnet regular, else \x00
+        return cls._address_versions.get(subtype, cls._address_versions.get(subtype.MAINNET_REGULAR, b'\x00'))
 
     @classmethod
     @abstractmethod

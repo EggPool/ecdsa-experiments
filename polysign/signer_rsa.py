@@ -21,8 +21,8 @@ class SignerRSA(Signer):
     __slots__ = ('_key', )
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
-                 compressed: bool = True):
-        super().__init__(private_key, public_key, address, compressed=False)
+                 compressed: bool = True, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
+        super().__init__(private_key, public_key, address, compressed=False, subtype=subtype)
         # RSA does not have compressed format
         self._type = SignerType.RSA
         # For the Key object
@@ -80,6 +80,10 @@ class SignerRSA(Signer):
             print("Exception {} reading RSA private key".format(e))
 
     def from_seed(self, seed: str='', subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> None:
+        """
+        if subtype != SignerSubType.MAINNET_REGULAR:
+            self._subtype = subtype
+        """
         raise ValueError("SignerRsa.from_seed not impl. - seed {}".format(seed))
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
