@@ -7,7 +7,7 @@ import hashlib
 from polysign.signer import Signer, SignerType, SignerSubType
 from typing import Union
 from hashlib import sha256
-from base64 import b64decode
+from base64 import b64decode, b64encode
 
 from coincurve import PrivateKey, PublicKey
 # from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
@@ -99,3 +99,12 @@ class SignerCRW(Signer):
         # Reconstruct address from pubkey to make sure it matches
         if address != cls.public_key_to_address(public_key):
             raise ValueError("Attempt to spend from a wrong address")
+
+    def sign_buffer_raw(self, buffer: bytes) -> bytes:
+        """Sign a buffer, sends a raw bytes array"""
+        pass
+
+    def sign_buffer_for_bis(self, buffer: bytes) -> str:
+        """Sign a buffer, sends under the format expected by bismuth network format"""
+        # sig is b64 encoded
+        return b64encode(self.sign_buffer_raw(buffer))

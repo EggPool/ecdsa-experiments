@@ -9,9 +9,10 @@ from os import urandom
 from polysign.signer import Signer, SignerType, SignerSubType
 from typing import Union
 from hashlib import sha256
-from base64 import b64decode
+from base64 import b64decode, b64encode
 
-from coincurve import PrivateKey, PublicKey
+from coincurve import PrivateKey, PublicKey, verify_signature
+
 # from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
 # FR: move from python ecdsa to libsecp256k1, supposed to be way faster to sign and verify transactions.
 # Use test cases and test vectors to make sure all is the same.
@@ -100,17 +101,19 @@ class SignerECDSA(Signer):
     def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str = '') -> None:
         """Verify signature from bismuth tx network format (ecdsa sig and pubkey are b64 encoded)
         Returns None, but raises ValueError if needed."""
-        public_key = b64decode(public_key).decode('utf-8')
-        # print(public_key)
-
-        """ TODO
-        public_key_object = RSA.importKey(public_key_pem)
-        signature_decoded = b64decode(signature)
-        verifier = PKCS1_v1_5.new(public_key_object)
-        sha_hash = SHA.new(buffer)
-        if not verifier.verify(sha_hash, signature_decoded):
+        public_key = b64decode(public_key)
+        valid = verify_signature(b64decode(signature), buffer, public_key)
+        if not valid:
             raise ValueError(f"Invalid signature from {address}")
-        """
         # Reconstruct address from pubkey to make sure it matches
         if address != cls.public_key_to_address(public_key):
             raise ValueError("Attempt to spend from a wrong address")
+
+    def sign_buffer_raw(self, buffer: bytes) -> bytes:
+        """Sign a buffer, sends a raw bytes array"""
+        return self._key.sign(buffer)
+
+    def sign_buffer_for_bis(self, buffer: bytes) -> str:
+        """Sign a buffer, sends under the format expected by bismuth network format"""
+        # return self.sign_buffer_raw(buffer)
+        return b64encode(self.sign_buffer_raw(buffer)).decode('utf-8')

@@ -114,4 +114,13 @@ class SignerRSA(Signer):
         if address != cls.public_key_to_address(public_key_pem):
             raise ValueError("Attempt to spend from a wrong address")
 
+    def sign_buffer_raw(self, buffer: bytes) -> bytes:
+        """Sign a buffer, returns a raw bytes array"""
+        h = SHA.new(buffer)
+        signer = PKCS1_v1_5.new(self._key)
+        return signer.sign(h)
 
+    def sign_buffer_for_bis(self, buffer: bytes) -> str:
+        """Sign a buffer, sends under the format expected by bismuth network format"""
+        # For RSA, sig is b64 encoded
+        return b64encode(self.sign_buffer_raw(buffer))

@@ -21,7 +21,10 @@ class SignerFactory():
                          subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> Signer:
         """Detect the type of the key, creates and return the matching signer"""
         # TODO - detect key type
-        signer = SignerRSA()
+        if signer_type == SignerType.RSA:
+            signer = SignerRSA()
+        elif signer_type == SignerType.ECDSA:
+            signer = SignerECDSA()
         signer.from_private_key(private_key, subtype)
         return signer
 
@@ -70,3 +73,4 @@ class SignerFactory():
         verifier = cls.address_to_signer(address)
         # let it do the job
         verifier.verify_bis_signature(signature,public_key, buffer, address)
+

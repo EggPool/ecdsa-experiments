@@ -101,6 +101,16 @@ class Signer(ABC):
         pubkey is b64 encoded twice - ecdsa and ed25519 are b64 encoded)"""
         pass
 
+    @abstractmethod
+    def sign_buffer_raw(self, buffer: bytes) -> bytes:
+        """Sign a buffer, sends a raw bytes array"""
+        pass
+
+    @abstractmethod
+    def sign_buffer_for_bis(self, buffer: bytes) -> str:
+        """Sign a buffer, sends under the format expected by bismuth network format"""
+        pass
+
     def to_dict(self):
         """Returns core properties as dict, compact bin form"""
         info = {'address': self._address, 'private_key': self._private_key, 'public_key': self._public_key,
