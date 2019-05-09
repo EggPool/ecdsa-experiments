@@ -1,6 +1,6 @@
 
 import json
-
+import re
 from hashlib import sha224
 from base64 import b64encode, b64decode
 from polysign.signer import Signer, SignerType
@@ -11,23 +11,56 @@ from Cryptodome.PublicKey import RSA
 from Cryptodome.Signature import PKCS1_v1_5
 from Cryptodome.Protocol.KDF import PBKDF2
 
+# Compile once and for all
+PEM_BEGIN = re.compile(r"\s*-----BEGIN (.*)-----\s+")
+PEM_END = re.compile(r"-----END (.*)-----\s*$")
+
 
 class SignerRSA(Signer):
 
     __slots__ = ('_key', )
 
-    def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str=''):
-        super().__init__(private_key, public_key, address)
+    def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
+                 compressed: bool = True):
+        super().__init__(private_key, public_key, address, compressed=False)
+        # RSA does not have compressed format
         self._type = SignerType.RSA
         # For the Key object
         self._key = None
 
-    def to_json(self):
+    @classmethod
+    def validate_pem(cls, pem_data: str) -> None:
+        """ Validate PEM data against :param public key:
+        :param public_key: public key to validate PEM against
+        The PEM data is constructed by base64 decoding the public key
+        Then, the data is tested against the PEM_BEGIN and PEM_END
+        to ensure the `pem_data` is valid, thus validating the public key.
+        returns None
+        """
+        # verify pem as cryptodome does
+        match = PEM_BEGIN.match(pem_data)
+        if not match:
+            raise ValueError("Not a valid PEM pre boundary")
+        marker = match.group(1)
+        match = PEM_END.search(pem_data)
+        if not match or match.group(1) != marker:
+            raise ValueError("Not a valid PEM post boundary")
+            # verify pem as cryptodome does
+
+    @classmethod
+    def public_key_to_address(cls, public_key: Union[bytes, str]) -> str:
+        """Reconstruct an address from the public key"""
+        if type(public_key) != str:
+            # But union annotation kept for common interface sake.
+            raise ValueError("RSA pubkey are str, pem format")
+        return sha224(public_key.encode('utf-8')).hexdigest()
+
+    def to_json(self) -> str:
         """for RSA, keys are stored as PEM format, not binary"""
         info = self.to_dict()
         return json.dumps(info)
 
-    def from_private_key(self, private_key: Union[bytes, str]):
+    def from_private_key(self, private_key: Union[bytes, str]) -> None:
         if type(private_key) is not str:
             raise RuntimeError('RSA private key have to be strings')
         try:
@@ -41,14 +74,38 @@ class SignerRSA(Signer):
             self._private_key = private_key
             self._public_key = public_key_readable
             self._address = address
-
         except Exception as e:
             print("Exception {} reading RSA private key".format(e))
 
+    def from_seed(self, seed: str='') -> None:
+        raise ValueError("SignerRsa.from_seed not impl. - seed {}".format(seed))
+
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
                        verify: bool=True):
-        print('TODO')
+        raise ValueError("SignerRsa.from_full_info not impl.")
 
-    def from_seed(self, seed: str=''):
-        print('TODO')
+    @classmethod
+    def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
+                         address: str='') -> None:
+        """Verify signature from raw signature. Address may be used to determine the sig type"""
+        raise ValueError("SignerRsa.verify_signature not impl.")
+
+    @classmethod
+    def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str = '') -> None:
+        """Verify signature from bismuth tx network format (rsa sig is b64 encoded twice)
+        Returns None, but raises ValueError if needed."""
+        public_key_pem = b64decode(public_key).decode('utf-8')
+        # print(public_key_pem)
+        # Will raise if does not match
+        cls.validate_pem(public_key_pem)
+        public_key_object = RSA.importKey(public_key_pem)
+        signature_decoded = b64decode(signature)
+        verifier = PKCS1_v1_5.new(public_key_object)
+        sha_hash = SHA.new(buffer)
+        if not verifier.verify(sha_hash, signature_decoded):
+            raise ValueError(f"Invalid signature from {address}")
+        # Reconstruct address from pubkey to make sure it matches
+        if address != cls.public_key_to_address(public_key_pem):
+            raise ValueError("Attempt to spend from a wrong address")
+
 

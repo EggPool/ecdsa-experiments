@@ -4,6 +4,8 @@
 
 import base58
 import hashlib
+import random
+from os import urandom
 from polysign.signer import Signer, SignerType
 from typing import Union
 from hashlib import sha256
@@ -18,6 +20,7 @@ from coincurve import PrivateKey, PublicKey
 
 ADDRESS_VERSION = b'\x6f'  # Bitcoin testnet
 ADDRESS_VERSION = b'\x00'  # Bitcoin mainnet
+ADDRESS_VERSION = b'\x01\x75\x07'  # CRW
 
 
 class SignerECDSA(Signer):
@@ -30,14 +33,27 @@ class SignerECDSA(Signer):
         self._type = SignerType.ECDSA
 
     def from_private_key(self, private_key: Union[bytes, str]):
-        print('TODO')
+        """Accepts both bytes[32] or str (hex format)"""
+        if type(private_key) == str:
+            return self.from_seed(private_key)
+        return self.from_seed(private_key.hex())
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
                        verify: bool=True):
-        print('TODO')
+        print('TODO - ecdsa.from_full_info')
 
     def from_seed(self, seed: str=''):
-        print('TODO ecdsa from seed {}'.format(seed))
+        """Creates key from seed - for ecdsa, seed = pk - 32 bytes random buffer"""
+        if len(seed) > 64:
+            # Too long seed, trim (could use better scheme for more entropy)
+            seed = seed[:64]
+        elif seed == '':
+            # No seed, use urandom
+            seed = urandom(32)
+        elif len(seed) < 64:
+            # Too short seed, use as PRNG seed
+            random.seed(seed)
+            seed = random.getrandbits(32*8).hex()
         try:
             key = PrivateKey.from_hex(seed)
             public_key = key.public_key.format(compressed=True).hex()
@@ -47,16 +63,15 @@ class SignerECDSA(Signer):
             self._public_key = public_key
         except Exception as e:
             print("Exception {} reading RSA private key".format(e))
-        print("identifier", self.identifier().hex())
+        # print("identifier", self.identifier().hex())
         self._address = self.address()
 
     def identifier(self):
-        """Returns double hash of pubkey"""
-        # faafd1966c79c472360ef1cf8860169df6e7554a
+        """Returns double hash of pubkey as per btc standards"""
         return hashlib.new('ripemd160', sha256(bytes.fromhex(self._public_key)).digest()).digest()
 
     def address(self):
-        # 1PrWZ4CXSXWbg87XS9ShhwMV6TiSXtycT7
+        """Returns properly serialized address from pubkey as per btc standards"""
         vh160 = ADDRESS_VERSION + self.identifier()  # raw content
         chk = sha256(sha256(vh160).digest()).digest()[:4]
         return base58.b58encode(vh160 + chk).decode('utf-8')

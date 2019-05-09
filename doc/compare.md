@@ -22,3 +22,6 @@ According to public research, RSA 2048-bit keys require 4098 qubits
 (and 5.2 trillion Tofolli gates) to be defeated, whereas ECDSA 256-bit keys
 require only 2330 qubits (and 126 billion Tofolli gates). Hence, RSA is more
 expensive to break, using a theoretical quantum machine.
+
+https://security.stackexchange.com/questions/50878/ecdsa-vs-ecdh-vs-ed25519-vs-curve25519
+https://medium.com/risan/upgrade-your-ssh-key-to-ed25519-c6e8d60d3c54
