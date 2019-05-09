@@ -2,16 +2,18 @@
 
 """
 
-import base58
 import hashlib
 import random
-from os import urandom
-from polysign.signer import Signer, SignerType, SignerSubType
-from typing import Union
-from hashlib import sha256
 from base64 import b64decode, b64encode
+from hashlib import sha256
+from os import urandom
+from typing import Union
 
-from coincurve import PrivateKey, PublicKey, verify_signature
+import base58
+from coincurve import PrivateKey, verify_signature
+
+from polysign.signer import Signer, SignerType, SignerSubType
+
 
 # from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
 # FR: move from python ecdsa to libsecp256k1, supposed to be way faster to sign and verify transactions.
@@ -115,5 +117,4 @@ class SignerECDSA(Signer):
 
     def sign_buffer_for_bis(self, buffer: bytes) -> str:
         """Sign a buffer, sends under the format expected by bismuth network format"""
-        # return self.sign_buffer_raw(buffer)
         return b64encode(self.sign_buffer_raw(buffer)).decode('utf-8')

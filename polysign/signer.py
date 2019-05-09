@@ -9,9 +9,6 @@ from enum import Enum
 from typing import Union
 
 
-__version__ = '0.0.1'
-
-
 class SignerType(Enum):
     """
     Possible signing schemes

@@ -1,12 +1,12 @@
 import re
 from os import urandom
-from polysign.signer import Signer, SignerType, SignerSubType
-from polysign.signer_rsa import SignerRSA
-from polysign.signer_ecdsa import SignerECDSA
-from polysign.signer_crw import SignerCRW
-from polysign.signer_btc import SignerBTC
 from typing import Union
 
+from polysign.signer import Signer, SignerType, SignerSubType
+from polysign.signer_btc import SignerBTC
+from polysign.signer_crw import SignerCRW
+from polysign.signer_ecdsa import SignerECDSA
+from polysign.signer_rsa import SignerRSA
 
 RE_RSA_ADDRESS = re.compile(r"[abcdef0123456789]{56}")
 # TODO: improve that ECDSA one
@@ -20,11 +20,12 @@ class SignerFactory():
     def from_private_key(cls, private_key: Union[bytes, str], signer_type: SignerType=SignerType.RSA,
                          subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> Signer:
         """Detect the type of the key, creates and return the matching signer"""
-        # TODO - detect key type
-        if signer_type == SignerType.RSA:
-            signer = SignerRSA()
-        elif signer_type == SignerType.ECDSA:
+        # TODO: detect by private_key
+        if signer_type == SignerType.ECDSA:
             signer = SignerECDSA()
+        else:
+            # default type
+            signer = SignerRSA()
         signer.from_private_key(private_key, subtype)
         return signer
 

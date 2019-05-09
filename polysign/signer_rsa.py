@@ -1,15 +1,15 @@
 
 import json
 import re
-from hashlib import sha224
 from base64 import b64encode, b64decode
-from polysign.signer import Signer, SignerType, SignerSubType
+from hashlib import sha224
 from typing import Union
 
 from Cryptodome.Hash import SHA
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Signature import PKCS1_v1_5
-from Cryptodome.Protocol.KDF import PBKDF2
+
+from polysign.signer import Signer, SignerType, SignerSubType
 
 # Compile once and for all
 PEM_BEGIN = re.compile(r"\s*-----BEGIN (.*)-----\s+")
@@ -101,7 +101,6 @@ class SignerRSA(Signer):
         """Verify signature from bismuth tx network format (rsa sig is b64 encoded twice)
         Returns None, but raises ValueError if needed."""
         public_key_pem = b64decode(public_key).decode('utf-8')
-        # print(public_key_pem)
         # Will raise if does not match
         cls.validate_pem(public_key_pem)
         public_key_object = RSA.importKey(public_key_pem)
