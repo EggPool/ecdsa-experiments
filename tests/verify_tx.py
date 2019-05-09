@@ -5,9 +5,7 @@ Demoes how to verify a generic tx
 import json
 import sys
 sys.path.append('../')
-from polysign.signer import SignerType
 from polysign.signerfactory import SignerFactory
-from Cryptodome.Hash import SHA
 
 if __name__ == "__main__":
     # Sample real rsa tx
