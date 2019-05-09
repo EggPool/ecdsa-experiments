@@ -22,7 +22,7 @@ class SignerRSA(Signer):
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
                  compressed: bool = True, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
-        super().__init__(private_key, public_key, address, compressed=False, subtype=subtype)
+        super().__init__(private_key, public_key, address, compressed=compressed, subtype=subtype)
         # RSA does not have compressed format
         self._type = SignerType.RSA
         # For the Key object
@@ -30,12 +30,8 @@ class SignerRSA(Signer):
 
     @classmethod
     def validate_pem(cls, pem_data: str) -> None:
-        """ Validate PEM data against :param public key:
-        :param public_key: public key to validate PEM against
-        The PEM data is constructed by base64 decoding the public key
-        Then, the data is tested against the PEM_BEGIN and PEM_END
-        to ensure the `pem_data` is valid, thus validating the public key.
-        returns None
+        """ Validate PEM data
+        returns None, raise on error.
         """
         # verify pem as cryptodome does
         match = PEM_BEGIN.match(pem_data)
@@ -91,7 +87,7 @@ class SignerRSA(Signer):
         raise ValueError("SignerRsa.from_full_info not impl.")
 
     @classmethod
-    def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
+    def verify_signature(cls, signature: Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
                          address: str='') -> None:
         """Verify signature from raw signature. Address may be used to determine the sig type"""
         raise ValueError("SignerRsa.verify_signature not impl.")

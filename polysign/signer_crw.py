@@ -8,13 +8,7 @@ from polysign.signer import Signer, SignerType, SignerSubType
 from typing import Union
 from hashlib import sha256
 from base64 import b64decode, b64encode
-
-from coincurve import PrivateKey, PublicKey
-# from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
-# FR: move from python ecdsa to libsecp256k1, supposed to be way faster to sign and verify transactions.
-# Use test cases and test vectors to make sure all is the same.
-# 2 candidates, https://github.com/ofek/coincurve  seems up to date and pretty good
-# https://github.com/ludbb/secp256k1-py   is older
+from coincurve import PrivateKey
 
 
 class SignerCRW(Signer):
@@ -25,7 +19,7 @@ class SignerCRW(Signer):
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
                  compressed=False, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
-        super().__init__(private_key, public_key, address, compressed=False, subtype=subtype)
+        super().__init__(private_key, public_key, address, compressed=compressed, subtype=subtype)
         self._key = None
         self._type = SignerType.ECDSA
 
@@ -76,7 +70,7 @@ class SignerCRW(Signer):
         return base58.b58encode(vh160 + checksum).decode('utf-8')
 
     @classmethod
-    def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
+    def verify_signature(cls, signature: Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
                          address: str='') -> None:
         """Verify signature from raw signature. Address may be used to determine the sig type"""
         raise ValueError("SignerCRW.verify_signature not impl.")

@@ -3,10 +3,10 @@ Test - Generate several random ECDSA Bis addresses of different types
 """
 
 import sys
+from os import urandom
 sys.path.append('../')
 from polysign.signer import SignerType, SignerSubType
 from polysign.signerfactory import SignerFactory
-from os import urandom
 
 
 if __name__ == "__main__":
@@ -18,4 +18,3 @@ if __name__ == "__main__":
                 pk = urandom(32).hex()
                 signer = SignerFactory.from_seed(pk, signer_type, subtype=subtype)
                 print("  ", signer.to_dict())
-

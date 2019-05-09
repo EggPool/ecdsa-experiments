@@ -6,7 +6,7 @@ import sys
 
 # lookup tables to convert integers in the range [0, 58) to base-58 digits and back
 int_to_b58_digit = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-b58_digit_to_int = { b58: i for i, b58 in enumerate(int_to_b58_digit) }
+b58_digit_to_int = {b58: i for i, b58 in enumerate(int_to_b58_digit)}
 
 
 # convert a (long) integer to its base-58 representation string
@@ -47,7 +47,7 @@ def prepended_bytes(prepended_b58_digits, b256_digit_count):
         min_int *= 58 ** b58_digit_count
 
         # uncomment to sanity-check that min_int is correct
-        #print(" min_int:", ones * '1' + int_to_base58_str(min_int))
+        # print(" min_int:", ones * '1' + int_to_base58_str(min_int))
 
         # right-shift by multiples of 8 bits (base-256) to retrieve only the
         # most-significant bytes which are to the left of the "real" base-256 data
@@ -68,12 +68,12 @@ def prepended_bytes(prepended_b58_digits, b256_digit_count):
 
                 # uncomment to confirm that the max possible value
                 # wouldn't have the desired prepended base-58 digits
-                #print("overflow:", ones * '1' + max_base58_str)
+                # print("overflow:", ones * '1' + max_base58_str)
 
                 continue
 
         # prepend any ones according to base58check rules, and convert min_int to a byte string
-        return ones * b'\0' + min_int.to_bytes(length= (min_int.bit_length() + 7) // 8, byteorder='big')
+        return ones * b'\0' + min_int.to_bytes(length=(min_int.bit_length() + 7) // 8, byteorder='big')
 
 
 if __name__ == '__main__':

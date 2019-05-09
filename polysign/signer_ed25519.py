@@ -2,9 +2,8 @@
 
 """
 
-import hashlib
 import random
-from base64 import b64decode, b64encode
+from base64 import b64decode
 from hashlib import sha256
 from os import urandom
 from typing import Union
@@ -18,8 +17,10 @@ class SignerED25519(Signer):
 
     __slots__ = ('_key', )
 
-    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x03\xb8\x6c\xf3', SignerSubType.MAINNET_MULTISIG: b'\x03\xb8\x72\x14',
-                         SignerSubType.TESTNET_REGULAR: b'\x11\xc2\xce\x7c', SignerSubType.TESTNET_MULTISIG: b'\x0f\x54\xfd\x2d'}
+    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x03\xb8\x6c\xf3',
+                         SignerSubType.MAINNET_MULTISIG: b'\x03\xb8\x72\x14',
+                         SignerSubType.TESTNET_REGULAR: b'\x11\xc2\xce\x7c',
+                         SignerSubType.TESTNET_MULTISIG: b'\x0f\x54\xfd\x2d'}
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
                  compressed: bool=False, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
@@ -94,7 +95,7 @@ class SignerED25519(Signer):
         return base58.b58encode(base + checksum).decode('utf-8')
 
     @classmethod
-    def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
+    def verify_signature(cls, signature: Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
                          address: str='') -> None:
         """Verify signature from raw signature. Address may be used to determine the sig subtype"""
         try:

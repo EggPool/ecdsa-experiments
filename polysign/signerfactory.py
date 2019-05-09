@@ -1,6 +1,6 @@
 import re
 from os import urandom
-from typing import Union
+from typing import Type, Union
 
 from polysign.signer import Signer, SignerType, SignerSubType
 from polysign.signer_btc import SignerBTC
@@ -14,7 +14,7 @@ RE_RSA_ADDRESS = re.compile(r"[abcdef0123456789]{56}")
 RE_ECDSA_ADDRESS = re.compile(r"^Bis")
 
 
-def signer_for_type(signer_type: SignerType) -> Union[Signer, None]:
+def signer_for_type(signer_type: SignerType) -> Union[Type[Signer], None]:
     """Returns the class matching a signer type."""
     links = {SignerType.RSA: SignerRSA, SignerType.ED25519: SignerED25519,
              SignerType.ECDSA: SignerECDSA, SignerType.BTC: SignerBTC,
@@ -23,7 +23,7 @@ def signer_for_type(signer_type: SignerType) -> Union[Signer, None]:
     return links.get(signer_type, None)
 
 
-class SignerFactory():
+class SignerFactory:
     """"""
 
     @classmethod
@@ -45,7 +45,7 @@ class SignerFactory():
         pass
 
     @classmethod
-    def address_to_signer(cls, address: str) -> Signer:
+    def address_to_signer(cls, address: str) -> Type[Signer]:
         if RE_RSA_ADDRESS.match(address):
             return SignerRSA
         elif RE_ECDSA_ADDRESS.match(address):
@@ -68,12 +68,10 @@ class SignerFactory():
         signer.from_seed(seed, subtype)
         return signer
 
-
     @classmethod
     def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str) -> None:
         """Verify signature from bismuth tx network format"""
         # Find the right signer class
         verifier = cls.address_to_signer(address)
         # let it do the job
-        verifier.verify_bis_signature(signature,public_key, buffer, address)
-
+        verifier.verify_bis_signature(signature, public_key, buffer, address)

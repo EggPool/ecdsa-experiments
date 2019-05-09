@@ -4,30 +4,24 @@
 
 import hashlib
 import random
-from base64 import b64decode, b64encode
+from base64 import b64decode
 from hashlib import sha256
 from os import urandom
 from typing import Union
 
 import base58
 from coincurve import PrivateKey, verify_signature
-
 from polysign.signer import Signer, SignerType, SignerSubType
-
-
-# from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
-# FR: move from python ecdsa to libsecp256k1, supposed to be way faster to sign and verify transactions.
-# Use test cases and test vectors to make sure all is the same.
-# 2 candidates, https://github.com/ofek/coincurve  seems up to date and pretty good
-# https://github.com/ludbb/secp256k1-py   is older
 
 
 class SignerECDSA(Signer):
 
     __slots__ = ('_key', )
 
-    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x4f\x54\x5b', SignerSubType.MAINNET_MULTISIG: b'\x4f\x54\xc8',
-                         SignerSubType.TESTNET_REGULAR: b'\x01\x7a\xb6\x85', SignerSubType.TESTNET_MULTISIG: b'\x01\x46\xeb\xa5'}
+    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x4f\x54\x5b',
+                         SignerSubType.MAINNET_MULTISIG: b'\x4f\x54\xc8',
+                         SignerSubType.TESTNET_REGULAR: b'\x01\x7a\xb6\x85',
+                         SignerSubType.TESTNET_MULTISIG: b'\x01\x46\xeb\xa5'}
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
                  compressed: bool=True, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
@@ -94,7 +88,7 @@ class SignerECDSA(Signer):
         return base58.b58encode(vh160 + checksum).decode('utf-8')
 
     @classmethod
-    def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
+    def verify_signature(cls, signature: Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
                          address: str='') -> None:
         """Verify signature from raw signature. Address may be used to determine the sig type"""
         raise ValueError("SignerECDSA.verify_signature not impl.")
