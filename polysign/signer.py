@@ -16,7 +16,7 @@ class SignerType(Enum):
     NONE = 0
     RSA = 1
     ECDSA = 2
-    EDD25519 = 3
+    ED25519 = 3
     BTC = 1000  # Tests
     CRW = 1001  # Tests
 

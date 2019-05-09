@@ -5,12 +5,22 @@ from typing import Union
 from polysign.signer import Signer, SignerType, SignerSubType
 from polysign.signer_btc import SignerBTC
 from polysign.signer_crw import SignerCRW
-from polysign.signer_ecdsa import SignerECDSA
 from polysign.signer_rsa import SignerRSA
+from polysign.signer_ecdsa import SignerECDSA
+from polysign.signer_ed25519 import SignerED25519
 
 RE_RSA_ADDRESS = re.compile(r"[abcdef0123456789]{56}")
 # TODO: improve that ECDSA one
 RE_ECDSA_ADDRESS = re.compile(r"^Bis")
+
+
+def signer_for_type(signer_type: SignerType) -> Union[Signer, None]:
+    """Returns the class matching a signer type."""
+    links = {SignerType.RSA: SignerRSA, SignerType.ED25519: SignerED25519,
+             SignerType.ECDSA: SignerECDSA, SignerType.BTC: SignerBTC,
+             SignerType.CRW: SignerCRW,
+             }
+    return links.get(signer_type, None)
 
 
 class SignerFactory():
@@ -21,11 +31,10 @@ class SignerFactory():
                          subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> Signer:
         """Detect the type of the key, creates and return the matching signer"""
         # TODO: detect by private_key
-        if signer_type == SignerType.ECDSA:
-            signer = SignerECDSA()
-        else:
-            # default type
-            signer = SignerRSA()
+        signer_class = signer_for_type(signer_type)
+        if signer_class is None:
+            raise ValueError("Unsupported Key type")
+        signer = signer_class()
         signer.from_private_key(private_key, subtype)
         return signer
 
@@ -40,7 +49,11 @@ class SignerFactory():
         if RE_RSA_ADDRESS.match(address):
             return SignerRSA
         elif RE_ECDSA_ADDRESS.match(address):
-            return SignerECDSA
+            if len(address) > 50:
+                return SignerED25519
+            else:
+                return SignerECDSA
+
         raise ValueError("Unsupported Address type")
 
     @classmethod
@@ -48,24 +61,13 @@ class SignerFactory():
                   subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> Signer:
         if seed == '':
             seed = urandom(32).hex()
-        # TODO: dict instead of all this, 3 lines
-        if signer_type == SignerType.RSA:
-            signer = SignerRSA()
-            signer.from_seed(seed, subtype)
-            return signer
-        elif signer_type == SignerType.ECDSA:
-            signer = SignerECDSA()
-            signer.from_seed(seed, subtype)
-            return signer
-        elif signer_type == SignerType.BTC:
-            signer = SignerBTC()
-            signer.from_seed(seed, subtype)
-            return signer
-        elif signer_type == SignerType.CRW:
-            signer = SignerCRW()
-            signer.from_seed(seed, subtype)
-            return signer
-        raise ValueError("Unsupported Key type")
+        signer_class = signer_for_type(signer_type)
+        if signer_class is None:
+            raise ValueError("Unsupported Key type")
+        signer = signer_class()
+        signer.from_seed(seed, subtype)
+        return signer
+
 
     @classmethod
     def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str) -> None:

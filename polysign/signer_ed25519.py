@@ -10,30 +10,22 @@ from os import urandom
 from typing import Union
 
 import base58
-from coincurve import PrivateKey, verify_signature
-
+import ed25519
 from polysign.signer import Signer, SignerType, SignerSubType
 
 
-# from ecdsa import SigningKey, SECP256k1, VerifyingKey, BadSignatureError
-# FR: move from python ecdsa to libsecp256k1, supposed to be way faster to sign and verify transactions.
-# Use test cases and test vectors to make sure all is the same.
-# 2 candidates, https://github.com/ofek/coincurve  seems up to date and pretty good
-# https://github.com/ludbb/secp256k1-py   is older
-
-
-class SignerECDSA(Signer):
+class SignerED25519(Signer):
 
     __slots__ = ('_key', )
 
-    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x4f\x54\x5b', SignerSubType.MAINNET_MULTISIG: b'\x4f\x54\xc8',
-                         SignerSubType.TESTNET_REGULAR: b'\x01\x7a\xb6\x85', SignerSubType.TESTNET_MULTISIG: b'\x01\x46\xeb\xa5'}
+    _address_versions = {SignerSubType.MAINNET_REGULAR: b'\x03\xb8\x6c\xf3', SignerSubType.MAINNET_MULTISIG: b'\x03\xb8\x72\x14',
+                         SignerSubType.TESTNET_REGULAR: b'\x11\xc2\xce\x7c', SignerSubType.TESTNET_MULTISIG: b'\x0f\x54\xfd\x2d'}
 
     def __init__(self, private_key: Union[bytes, str]=b'', public_key: Union[bytes, str]=b'', address: str='',
-                 compressed: bool=True, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
+                 compressed: bool=False, subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         super().__init__(private_key, public_key, address, compressed=compressed, subtype=subtype)
         self._key = None
-        self._type = SignerType.ECDSA
+        self._type = SignerType.ED25519
 
     def from_private_key(self, private_key: Union[bytes, str], subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
         """Accepts both bytes[32] or str (hex format)"""
@@ -43,10 +35,10 @@ class SignerECDSA(Signer):
 
     def from_full_info(self, private_key: Union[bytes, str], public_key: Union[bytes, str]=b'', address: str='',
                        subtype: SignerSubType = SignerSubType.MAINNET_REGULAR, verify: bool=True):
-        raise ValueError("SignerRsa.from_full_info not impl.")
+        raise ValueError("SignerED25519.from_full_info not impl.")
 
     def from_seed(self, seed: str='', subtype: SignerSubType=SignerSubType.MAINNET_REGULAR):
-        """Creates key from seed - for ecdsa, seed = pk - 32 bytes random buffer"""
+        """Creates key from seed - for ED25519, seed = pk - 32 bytes random buffer"""
         if subtype != SignerSubType.MAINNET_REGULAR:
             self._subtype = subtype
         if len(seed) > 64:
@@ -60,56 +52,68 @@ class SignerECDSA(Signer):
             random.seed(seed)
             seed = random.getrandbits(32*8).hex()
         try:
-            key = PrivateKey.from_hex(seed)
-            public_key = key.public_key.format(compressed=True).hex()
-            # print("Public Key", public_key)
+            print("SEED", seed)
+            # TODO: check flow, there may be many unnecessary hex-byte-hex-bytes conversions from top to bottom
+            key = ed25519.SigningKey(bytes.fromhex(seed))
+            hexa = key.to_ascii(encoding="hex").decode('utf-8')
+            # print("ED25519 Privk Key", hexa)  # e5b42f3c-3fe02e16-1d42ff47-07a174a5 715b2badc7d4d3aebbea9081bd9123d5
+            verifying_key = key.get_verifying_key()
+            public_key = verifying_key.to_ascii(encoding="hex").decode('utf-8')
+            # public_key = hexa[32:]
+            # print("ED25519 Public Key", public_key)
             self._key = key
-            self._private_key = key.to_hex()  # == seed
+            self._private_key = hexa
             self._public_key = public_key
         except Exception as e:
-            print("Exception {} reading RSA private key".format(e))
+            print("Exception {} reading ED25519 private key".format(e))
         # print("identifier", self.identifier().hex())
         self._address = self.address()
 
+    """
     def identifier(self):
-        """Returns double hash of pubkey as per btc standards"""
+        #Returns double hash of pubkey as per btc standards
         return hashlib.new('ripemd160', sha256(bytes.fromhex(self._public_key)).digest()).digest()
+    """
 
-    def address(self):
-        """Returns properly serialized address from pubkey as per btc standards"""
-        vh160 = self.address_version_for_subtype(self._subtype) + self.identifier()  # raw content
-        chk = sha256(sha256(vh160).digest()).digest()[:4]
-        return base58.b58encode(vh160 + chk).decode('utf-8')
+    def address(self) -> str:
+        """Returns properly serialized address from pubkey"""
+        # No double hash for pubkey, nor for checksum
+        base = self.address_version_for_subtype(self._subtype) + bytes.fromhex(self._public_key)  # raw content
+        chk = sha256(base).digest()[:4]
+        return base58.b58encode(base + chk).decode('utf-8')
 
     @classmethod
     def public_key_to_address(cls, public_key: Union[bytes, str],
                               subtype: SignerSubType=SignerSubType.MAINNET_REGULAR) -> str:
         """Reconstruct an address from the public key"""
+        # TODO: same for this family, could factorize in an ancestor with other methods
         if type(public_key) == str:
-            identifier = hashlib.new('ripemd160', sha256(bytes.fromhex(public_key)).digest()).digest()
-        else:
-            identifier = hashlib.new('ripemd160', sha256(public_key).digest()).digest()
-        vh160 = cls.address_version_for_subtype(subtype) + identifier  # raw content
-        checksum = sha256(sha256(vh160).digest()).digest()[:4]
-        return base58.b58encode(vh160 + checksum).decode('utf-8')
+            public_key = bytes.fromhex(public_key)
+        base = cls.address_version_for_subtype(subtype) + public_key  # raw content
+        checksum = sha256(base).digest()[:4]
+        return base58.b58encode(base + checksum).decode('utf-8')
 
     @classmethod
     def verify_signature(cls, signature:Union[bytes, str], public_key: Union[bytes, str], buffer: bytes,
                          address: str='') -> None:
-        """Verify signature from raw signature. Address may be used to determine the sig type"""
-        raise ValueError("SignerECDSA.verify_signature not impl.")
+        """Verify signature from raw signature. Address may be used to determine the sig subtype"""
+        try:
+            # print("verif", signature, public_key, len(public_key))
+            verifying_key = ed25519.VerifyingKey(public_key)
+            verifying_key.verify(signature, buffer)
+        except Exception as e:
+            print(e)
+            raise ValueError(f"Invalid ED25519 signature from {address}")
+        # Reconstruct address from pubkey to make sure it matches
+        address_rebuild = cls.public_key_to_address(public_key)
+        if address != address_rebuild:
+            raise ValueError(f"Attempt to spend from a wrong address {address} instead of {address_rebuild}")
 
     @classmethod
     def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str = '') -> None:
         """Verify signature from bismuth tx network format (ecdsa sig and pubkey are b64 encoded)
         Returns None, but raises ValueError if needed."""
-        public_key = b64decode(public_key)
-        valid = verify_signature(base58.b58decode(signature), buffer, public_key)
-        if not valid:
-            raise ValueError(f"Invalid signature from {address}")
-        # Reconstruct address from pubkey to make sure it matches
-        if address != cls.public_key_to_address(public_key):
-            raise ValueError("Attempt to spend from a wrong address")
+        cls.verify_signature(base58.b58decode(signature), b64decode(public_key), buffer, address)
 
     def sign_buffer_raw(self, buffer: bytes) -> bytes:
         """Sign a buffer, sends a raw bytes array"""

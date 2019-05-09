@@ -31,3 +31,15 @@ if __name__ == "__main__":
 
     SignerFactory.verify_bis_signature(ecdsa_tx['signature'], ecdsa_tx['public_key'], buffer, ecdsa_tx['address'])
     print("ECDSA: No Error")
+
+    # Sample fake ed25519 tx
+    with open("ed25519_tx2.json") as f:
+        ecdsa_tx = json.load(f)
+
+    # Caller is responsible for creating the bin buffer to check the sig against
+    buffer = str((ecdsa_tx['timestamp'], ecdsa_tx['address'], ecdsa_tx['recipient'],
+                  ecdsa_tx['amount'], ecdsa_tx['operation'], ecdsa_tx['openfield'])).encode("utf-8")
+    print("buffer", buffer)
+
+    SignerFactory.verify_bis_signature(ecdsa_tx['signature'], ecdsa_tx['public_key'], buffer, ecdsa_tx['address'])
+    print("ED25519: No Error")
