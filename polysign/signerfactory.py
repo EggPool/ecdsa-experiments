@@ -52,3 +52,11 @@ class SignerFactory():
             signer.from_seed(seed)
             return signer
         raise ValueError("Unsupported Key type")
+
+    @classmethod
+    def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str) -> None:
+        """Verify signature from bismuth tx network format"""
+        # Find the right signer class
+        verifier = cls.address_to_signer(address)
+        # let it do the job
+        verifier.verify_bis_signature(signature,public_key, buffer, address)

@@ -17,7 +17,5 @@ if __name__ == "__main__":
                   rsa_tx['amount'], rsa_tx['operation'], rsa_tx['openfield'])).encode("utf-8")
     print("buffer", buffer)
 
-    verifier = SignerFactory.address_to_signer(rsa_tx['address'])
-    print("Signer/Verifier class", verifier)
-    verifier.verify_bis_signature(rsa_tx['signature'], rsa_tx['public_key'], buffer, rsa_tx['address'])
+    SignerFactory.verify_bis_signature(rsa_tx['signature'], rsa_tx['public_key'], buffer, rsa_tx['address'])
     print("No Error")
