@@ -4,7 +4,7 @@
 
 import hashlib
 import random
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from hashlib import sha256
 from os import urandom
 from typing import Union
@@ -98,7 +98,7 @@ class SignerECDSA(Signer):
         """Verify signature from bismuth tx network format (ecdsa sig and pubkey are b64 encoded)
         Returns None, but raises ValueError if needed."""
         public_key = b64decode(public_key)
-        valid = verify_signature(base58.b58decode(signature), buffer, public_key)
+        valid = verify_signature(b64decode(signature), buffer, public_key)
         if not valid:
             raise ValueError(f"Invalid signature from {address}")
         # Reconstruct address from pubkey to make sure it matches
@@ -112,4 +112,4 @@ class SignerECDSA(Signer):
 
     def sign_buffer_for_bis(self, buffer: bytes) -> str:
         """Sign a buffer, sends under the format expected by bismuth network format"""
-        return base58.b58encode(self.sign_buffer_raw(buffer)).decode('utf-8')
+        return b64encode(self.sign_buffer_raw(buffer)).decode('utf-8')

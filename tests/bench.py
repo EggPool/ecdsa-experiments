@@ -29,10 +29,12 @@ def decode_hex():
         dec =  bytes.fromhex(SIGNATURE_HEX)
     return dec
 
+
 def timer(function):
     start = time()
     function()
     print(function, time() - start)
+
 
 if __name__ == '__main__':
     timer(decode_58)

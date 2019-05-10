@@ -3,7 +3,7 @@
 """
 
 import random
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from hashlib import sha256
 from os import urandom
 from typing import Union
@@ -114,7 +114,7 @@ class SignerED25519(Signer):
     def verify_bis_signature(cls, signature: str, public_key: str, buffer: bytes, address: str = '') -> None:
         """Verify signature from bismuth tx network format (ecdsa sig and pubkey are b64 encoded)
         Returns None, but raises ValueError if needed."""
-        cls.verify_signature(base58.b58decode(signature), b64decode(public_key), buffer, address)
+        cls.verify_signature(b64decode(signature), b64decode(public_key), buffer, address)
 
     def sign_buffer_raw(self, buffer: bytes) -> bytes:
         """Sign a buffer, sends a raw bytes array"""
@@ -122,4 +122,4 @@ class SignerED25519(Signer):
 
     def sign_buffer_for_bis(self, buffer: bytes) -> str:
         """Sign a buffer, sends under the format expected by bismuth network format"""
-        return base58.b58encode(self.sign_buffer_raw(buffer)).decode('utf-8')
+        return b64encode(self.sign_buffer_raw(buffer)).decode('utf-8')
