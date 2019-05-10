@@ -120,8 +120,3 @@ class Signer(ABC):
         info['private_key'] = info['private_key'].hex()
         info['public_key'] = info['public_key'].hex()
         return json.dumps(info)
-
-
-
-
-

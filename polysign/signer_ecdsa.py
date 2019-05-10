@@ -107,6 +107,7 @@ class SignerECDSA(Signer):
 
     def sign_buffer_raw(self, buffer: bytes) -> bytes:
         """Sign a buffer, sends a raw bytes array"""
+        # TODO: see "custom_nonce" optional item
         return self._key.sign(buffer)
 
     def sign_buffer_for_bis(self, buffer: bytes) -> str:
