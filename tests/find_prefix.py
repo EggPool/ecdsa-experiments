@@ -5,13 +5,13 @@ import sys
 
 
 # lookup tables to convert integers in the range [0, 58) to base-58 digits and back
-int_to_b58_digit = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+int_to_b58_digit = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 b58_digit_to_int = {b58: i for i, b58 in enumerate(int_to_b58_digit)}
 
 
 # convert a (long) integer to its base-58 representation string
 def int_to_base58_str(int_rep):
-    base58_str = ''
+    base58_str = ""
     while int_rep:
         int_rep, remainder = divmod(int_rep, 58)
         base58_str = int_to_b58_digit[remainder] + base58_str
@@ -24,12 +24,12 @@ def prepended_bytes(prepended_b58_digits, b256_digit_count):
     # count and remove them, they are added back in later
     ones = 0
     for b58 in prepended_b58_digits:
-        if b58 != '1':
+        if b58 != "1":
             break
         ones += 1
         prepended_b58_digits = prepended_b58_digits[1:]
     if not prepended_b58_digits:  # if they're all 1's
-        return ones * b'\0'
+        return ones * b"\0"
 
     # calc the # of base58 digits required for b256_digit_count bytes of "real" data
     # (not including the prepended base58 digits)
@@ -60,11 +60,15 @@ def prepended_bytes(prepended_b58_digits, b256_digit_count):
         # data could cause an overflow in base-58 making the prepended_b58_digits increment
         # by one; if this could happen, left-shift prepended_b58_digits and repeat
         if do_overflow_check:
-            max_real_data_int = (1 << b256_digit_count*8) - 1
-            max_base58_str = int_to_base58_str((min_int << b256_digit_count*8) + max_real_data_int)
+            max_real_data_int = (1 << b256_digit_count * 8) - 1
+            max_base58_str = int_to_base58_str(
+                (min_int << b256_digit_count * 8) + max_real_data_int
+            )
             if not max_base58_str.startswith(prepended_b58_digits):
-                prepended_b58_digits += '1'
-                do_overflow_check = False  # it doesn't matter if the '1' appended above overflows to '2'
+                prepended_b58_digits += "1"
+                do_overflow_check = (
+                    False
+                )  # it doesn't matter if the '1' appended above overflows to '2'
 
                 # uncomment to confirm that the max possible value
                 # wouldn't have the desired prepended base-58 digits
@@ -73,15 +77,23 @@ def prepended_bytes(prepended_b58_digits, b256_digit_count):
                 continue
 
         # prepend any ones according to base58check rules, and convert min_int to a byte string
-        return ones * b'\0' + min_int.to_bytes(length=(min_int.bit_length() + 7) // 8, byteorder='big')
+        return ones * b"\0" + min_int.to_bytes(
+            length=(min_int.bit_length() + 7) // 8, byteorder="big"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) != 3:
-        sys.exit('usage: {} <STRING-TO-PREPEND> <DATA-BYTE-LEN (excluding 4-byte checksum)>'.format(sys.argv[0]))
+        sys.exit(
+            "usage: {} <STRING-TO-PREPEND> <DATA-BYTE-LEN (excluding 4-byte checksum)>".format(
+                sys.argv[0]
+            )
+        )
 
-    result = prepended_bytes(sys.argv[1], int(sys.argv[2]) + 4)  # add 4 for the checksum
-    print(', '.join('{:#04x}'.format(i) for i in result))
+    result = prepended_bytes(
+        sys.argv[1], int(sys.argv[2]) + 4
+    )  # add 4 for the checksum
+    print(", ".join("{:#04x}".format(i) for i in result))
 
     """
     ECDSA (len 20 bytes + 4)
