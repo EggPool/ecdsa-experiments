@@ -21,7 +21,7 @@ A Bismuth Transaction (buffer to be signed) is composed of:
    - operation : string, optional, max 30 chars
    - openfield : string, optional, max 100000 chars
 
-## Buffer to sign
+## Buffer to sign
 
 The buffer to be signed is a string representation of the transaction above, as a tuple.  
 It's format is very precise, spaces and decimals included.
@@ -61,7 +61,7 @@ A Full Bismuth Transaction (list to send to network) has extra info, signature a
    
 ecdsa_txs.json contains the signatures and pubkeys also, as string   
  
-## Sending the transaction
+## Sending the transaction
 
 Command is sent over websocket, as a json array [command, options]
 options begin an array, even if there is one option only.
