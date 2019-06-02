@@ -15,6 +15,7 @@ from polysign.signerfactory import SignerFactory
 
 TIMESTAMP = 1559472321.17
 
+
 def quantize_two(value):
     value = Decimal(value)
     value = value.quantize(Decimal("0.00"))
@@ -27,7 +28,8 @@ def quantize_eight(value):
     return value
 
 
-def get_tx_vector(i: int, tx: dict) -> dict:
+def get_tx_vector(i: int, a_tx: dict) -> dict:
+    tx = dict(a_tx)  # deep copy
     tx["timestamp"] = "%.2f" % quantize_two(tx["timestamp"])
     tx["amount"] = "%.8f" % quantize_eight(tx["amount"])
     vector = {"id": i, "tx": tx}
@@ -92,6 +94,7 @@ if __name__ == "__main__":
         "openfield": "fake_tx_info",
     }
     vectors.append(get_tx_vector(0, tx))
+
     random.seed(555)  # reproducible results
     tx["openfield"] = ""
     for i in range(10):

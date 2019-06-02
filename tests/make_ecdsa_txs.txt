@@ -1,4 +1,5 @@
 {'address': 'Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog', 'private_key': 'e5b42f3c3fe02e161d42ff4707a174a5715b2badc7d4d3aebbea9081bd9123d5', 'public_key': '0349746ba011ce72adea758e092159622baaa5009faca72ad4316792d828b7796a', 'compressed': True, 'type': 'ECDSA', 'sub_type': 'MAINNET_REGULAR'}
+
 Buffer 0: ('1559472321.00', 'Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog', 'f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac', '0.63000000', '', 'fake_tx_info')
 ECDSA Signature MEQCIHu5eNOhmebPTxqHWEMsLJcvFa8i+8hMrsGVXt5xI7rmAiAwFbs3HSGnKiujcbbzRAkVmgTlbG2vU3kOyGe9YWTqfA==
 websocket : ["mpinsert", [["1559472321.00", "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog", "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac", "0.63000000", "MEQCIHu5eNOhmebPTxqHWEMsLJcvFa8i+8hMrsGVXt5xI7rmAiAwFbs3HSGnKiujcbbzRAkVmgTlbG2vU3kOyGe9YWTqfA==", "A0l0a6ARznKt6nWOCSFZYiuqpQCfrKcq1DFnktgot3lq", "", "fake_tx_info"]]]

@@ -2,12 +2,12 @@
   {
     "id": 0,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.00",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.63000000",
       "operation": "",
-      "openfield": ""
+      "openfield": "fake_tx_info"
     },
     "buffer": "('1559472321.00', 'Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog', 'f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac', '0.63000000', '', 'fake_tx_info')",
     "signature": "MEQCIHu5eNOhmebPTxqHWEMsLJcvFa8i+8hMrsGVXt5xI7rmAiAwFbs3HSGnKiujcbbzRAkVmgTlbG2vU3kOyGe9YWTqfA==",
@@ -17,10 +17,10 @@
   {
     "id": 1,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.17",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.19700000",
       "operation": "",
       "openfield": ""
     },
@@ -32,10 +32,10 @@
   {
     "id": 2,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.18",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.28100000",
       "operation": "",
       "openfield": ""
     },
@@ -47,10 +47,10 @@
   {
     "id": 3,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.19",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.16400000",
       "operation": "",
       "openfield": ""
     },
@@ -62,10 +62,10 @@
   {
     "id": 4,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.20",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.13100000",
       "operation": "",
       "openfield": ""
     },
@@ -77,10 +77,10 @@
   {
     "id": 5,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.21",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.57400000",
       "operation": "",
       "openfield": ""
     },
@@ -92,10 +92,10 @@
   {
     "id": 6,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.22",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.72500000",
       "operation": "",
       "openfield": ""
     },
@@ -107,10 +107,10 @@
   {
     "id": 7,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.23",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.94100000",
       "operation": "",
       "openfield": ""
     },
@@ -122,10 +122,10 @@
   {
     "id": 8,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.24",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.10900000",
       "operation": "",
       "openfield": ""
     },
@@ -137,10 +137,10 @@
   {
     "id": 9,
     "tx": {
-      "timestamp": "1559472321.26",
+      "timestamp": "1559472321.25",
       "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
       "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
-      "amount": "0.26100000",
+      "amount": "0.15700000",
       "operation": "",
       "openfield": ""
     },

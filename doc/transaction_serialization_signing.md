@@ -73,3 +73,20 @@ https://github.com/gabidi/bismuth-web-wallet can be useful also.
 (only the key and signing changes, transaction assembling, signing and sending works the same)
 
 ecdsa_txs.json also contains the matching websocket commands, as string.   
+
+# Sample from ecdsa_txs.json
+
+```
+ "tx": {
+      "timestamp": "1559472321.00",
+      "address": "Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog",
+      "recipient": "f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac",
+      "amount": "0.63000000",
+      "operation": "",
+      "openfield": "fake_tx_info"
+    },
+    "buffer": "('1559472321.00', 'Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog', 'f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac', '0.63000000', '', 'fake_tx_info')",
+    "signature": "MEQCIHu5eNOhmebPTxqHWEMsLJcvFa8i+8hMrsGVXt5xI7rmAiAwFbs3HSGnKiujcbbzRAkVmgTlbG2vU3kOyGe9YWTqfA==",
+    "public_key": "A0l0a6ARznKt6nWOCSFZYiuqpQCfrKcq1DFnktgot3lq",
+    "websocket_command": "[\"mpinsert\", [[\"1559472321.00\", \"Bis1SAk19HCWpDAThwFiaP9xA6zWjzsga7Hog\", \"f6c0363ca1c5aa28cc584252e65a63998493ff0a5ec1bb16beda9bac\", \"0.63000000\", \"MEQCIHu5eNOhmebPTxqHWEMsLJcvFa8i+8hMrsGVXt5xI7rmAiAwFbs3HSGnKiujcbbzRAkVmgTlbG2vU3kOyGe9YWTqfA==\", \"A0l0a6ARznKt6nWOCSFZYiuqpQCfrKcq1DFnktgot3lq\", \"\", \"fake_tx_info\"]]]"
+```
