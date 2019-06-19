@@ -1,5 +1,5 @@
 """
-Creates BTC and test addresses from BIP32 test vectors.
+Creates Bis and test addresses from BIP32 test vectors.
 """
 
 import base58
